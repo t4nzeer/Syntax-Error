@@ -1,0 +1,164 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Book {
+    private String title;
+    private String author;
+    private boolean isAvailable;
+
+    public Book(String title, String author) {
+        this.title = title;
+        this.author = author;
+        this.isAvailable = true;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
+
+    @Override
+    public String toString() {
+        return title + " by " + author + (isAvailable ? " (Available)" : " (Not Available)");
+    }
+}
+
+class User {
+    private String name;
+    private ArrayList<Book> borrowedBooks;
+
+    public User(String name) {
+        this.name = name;
+        this.borrowedBooks = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void borrowBook(Book book) {
+        borrowedBooks.add(book);
+        book.setAvailable(false);
+    }
+
+    public void returnBook(Book book) {
+        borrowedBooks.remove(book);
+        book.setAvailable(true);
+    }
+
+    public ArrayList<Book> getBorrowedBooks() {
+        return borrowedBooks;
+    }
+}
+
+class Library {
+    private ArrayList<Book> books;
+    private ArrayList<User> users;
+
+    public Library() {
+        this.books = new ArrayList<>();
+        this.users = new ArrayList<>();
+    }
+
+    public void addBook(Book book) {
+        books.add(book);
+    }
+
+    public void addUser (User user) {
+        users.add(user);
+    }
+
+    public void borrowBook(User user, String bookTitle) {
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(bookTitle) && book.isAvailable()) {
+                user.borrowBook(book);
+                System.out.println(user.getName() + " borrowed " + book.getTitle());
+                return;
+            }
+        }
+        System.out.println("Book not available or does not exist.");
+    }
+
+    public void returnBook(User user, String bookTitle) {
+        for (Book book : user.getBorrowedBooks()) {
+            if (book.getTitle().equalsIgnoreCase(bookTitle)) {
+                user.returnBook(book);
+                System.out.println(user.getName() + " returned " + book.getTitle());
+                return;
+            }
+        }
+        System.out.println("You have not borrowed this book.");
+    }
+
+    public void displayBooks() {
+        System.out.println("Available Books:");
+        for (Book book : books) {
+            System.out.println(book);
+        }
+    }
+}
+
+public class LibraryManagementSystem {
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Library library = new Library();
+
+        // Adding sample books
+        library.addBook(new Book("1984", "George Orwell"));
+        library.addBook(new Book("To Kill a Mockingbird", "Harper Lee"));
+        library.addBook(new Book("The Great Gatsby", "F. Scott Fitzgerald"));
+
+        // Adding sample users
+        library.addUser (new User("Alice"));
+        library.addUser (new User("Bob"));
+
+        while (true) {
+            System.out.println("\nLibrary Management System");
+            System.out.println("1. Display Books");
+            System.out.println("2. Borrow Book");
+            System.out.println("3. Return Book");
+            System.out.println("4. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    library.displayBooks();
+                    break;
+                case 2:
+                    System.out.print("Enter your name: ");
+                    String borrowerName = scanner.nextLine();
+                    System.out.print("Enter book title to borrow: ");
+                    String borrowTitle = scanner.nextLine();
+                    User borrower = new User(borrowerName);
+                    library.borrowBook(borrower, borrowTitle);
+                    break;
+                case 3:
+                    System.out.print("Enter your name: ");
+                    String returnerName = scanner.nextLine();
+                    System.out.print("Enter book title to return: ");
+                    String returnTitle = scanner.nextLine();
+                    User returner = new User(returnerName);
+                    library.returnBook(returner, returnTitle);
+                    break;
+                case 4:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again")
